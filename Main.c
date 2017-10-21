@@ -72,7 +72,6 @@ void generate_blockboard(void){
 	new_board.N = N_arg;
 	new_board.i_max = N_arg*N_arg;
 	new_board.tiles = (struct Tuple**)malloc(sizeof(struct Tuple) * new_board.i_max);
-
 }
 
 
