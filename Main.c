@@ -2,13 +2,12 @@
 #include "headers/main.h"
 
 int N_arg = 3;
+struct Tuple g_tile_arr[4096];
 
 
 int main (int argc, char **argv){
-
 	generate_args(argc, argv);
 	generate_blockboard();
-
 }
 
 void generate_args(int argc, char** argv){
@@ -51,9 +50,10 @@ void generate_args(int argc, char** argv){
 				}
 
 				for(int x = 0; x < i; x++){
-					tile_arr[x].x = strtol(strtok(tuple_arr[x], ","), NULL, 10);
-					tile_arr[x].y = strtol(strtok(NULL, ","), NULL, 10);
-					printf("Loaded tuple [%d,%d]\n", tile_arr[x].x, tile_arr[x].y);
+					g_tile_arr[x].x = strtol(strtok(tuple_arr[x], ","), NULL, 10);
+					g_tile_arr[x].y = strtol(strtok(NULL, ","), NULL, 10);
+					g_tile_arr[x].initialised = 1;
+					printf("Loaded tuple [%d,%d]\n", g_tile_arr[x].x, g_tile_arr[x].y);
 				}
 
 				break;
@@ -67,11 +67,20 @@ void generate_args(int argc, char** argv){
 }
 
 
-void generate_blockboard(void){
+struct Blockboard generate_blockboard(void){
 	struct Blockboard new_board;
 	new_board.N = N_arg;
 	new_board.i_max = N_arg*N_arg;
-	new_board.tiles = (struct Tuple**)malloc(sizeof(struct Tuple) * new_board.i_max);
+	new_board.tiles = (struct Tuple**)malloc(sizeof(struct Tuple)*new_board.i_max);
+	for(int i = 0; i < 4096; i++){
+		if(g_tile_arr[i].initialised == 1){
+			new_board.tiles[i] = &g_tile_arr[i];
+		} else {
+			break;
+		}
+	}
+	
+	return new_board;
 }
 
 

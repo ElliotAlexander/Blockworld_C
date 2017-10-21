@@ -10,11 +10,12 @@
 #include <getopt.h>
 
 void generate_args(int argc, char** argv);
-void generate_blockboard(void);
+struct Blockboard generate_blockboard(void);
 
 typedef struct Tuple {
     int x;
     int y;
+	int initialised;
 } tTuple;
 
 typedef struct Square {
