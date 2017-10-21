@@ -1,8 +1,8 @@
-
 #include "headers/main.h"
 
 int N_arg = 3;
 struct Tuple g_tile_arr[4096];
+struct Tuple g_agent;
 
 
 int main (int argc, char **argv){
@@ -68,23 +68,28 @@ void generate_args(int argc, char** argv){
 
 
 struct Blockboard generate_blockboard(void){
+	printf("Generating new block board.\n");
 	struct Blockboard new_board;
 	new_board.N = N_arg;
 	new_board.i_max = N_arg*N_arg;
-	new_board.tiles = (struct Tuple**)malloc(sizeof(struct Tuple)*new_board.i_max);
 	for(int i = 0; i < 4096; i++){
 		if(g_tile_arr[i].initialised == 1){
-			new_board.tiles[i] = &g_tile_arr[i];
+			struct Tuple t;
+			t.initialised = 1;
+			t.x = g_tile_arr[i].x;
+			t.y = g_tile_arr[i].y;
+			new_board.tiles[i] = t;
+			coord_to_index(new_board.tiles[i], new_board);
 		} else {
 			break;
 		}
 	}
-	
+
 	return new_board;
 }
 
 
 int coord_to_index(struct Tuple t, struct Blockboard b){
-	int index = ((t.y * b.N) + (t.x % b.N));
+	int index = (((t.y-1) * b.N) + (t.x % (b.N+1)));
 	return index;
 }
