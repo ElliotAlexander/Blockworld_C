@@ -1,12 +1,20 @@
+
 #include "headers/main.h"
 
-int N = 3;
+int N_arg = 3;
 
 
 int main (int argc, char **argv){
 
+	generate_args(argc, argv);
+	generate_blockboard();
+
+}
+
+void generate_args(int argc, char** argv){
 	int c = 0;
-	while((c = getopt(argc, argv, "n:a:t:")) != -1){
+	while((c = getopt(argc, argv, "n: a: t:")) != -1){
+
 		// Program arguments
 		switch(c){
 
@@ -14,18 +22,16 @@ int main (int argc, char **argv){
 			case 'n':
 			{
 				int state_val;
-				state_val = sscanf(optarg, "%d", &N);
-				printf("Parsing N = %d | Return code : %d \n", N, state_val);
+				state_val = sscanf(optarg, "%d", &N_arg);
+				printf("Parsing N = %d | Return code : %d \n", N_arg, state_val);
 				break;
 			}
 
 			// position of agent
 			case 'a':
-			{	
-				char* tuple_string;
-				tuple_string = optarg;
-				int x,y;
-				int state_val = sscanf(strtok(tuple_string, ","), "%d", &x);
+			{
+				int x,y, state_val;
+				state_val = sscanf(strtok(optarg, ","), "%d", &x);
 				state_val = state_val && (sscanf(strtok(NULL, ","), "%d", &y));
 				printf("Parsed agent position of [%d,%d] | return state %d\n", x, y, state_val);
 				break;
@@ -36,7 +42,7 @@ int main (int argc, char **argv){
 			{
 				int i = 0;
 				char* tuple_arr[128];
-				struct Tuple tile_arr[N*N];
+				struct Tuple tile_arr[N_arg*N_arg];
 
 				tuple_arr[i] = strtok(optarg, ":");
 				while(tuple_arr[i] != NULL){
@@ -49,17 +55,28 @@ int main (int argc, char **argv){
 					tile_arr[x].y = strtol(strtok(NULL, ","), NULL, 10);
 					printf("Loaded tuple [%d,%d]\n", tile_arr[x].x, tile_arr[x].y);
 				}
+
+				break;
+			}
+			default: {
+				printf("Unrecognised arg. Skipping.\n");
 				break;
 			}
 		}
 	}
+}
 
+
+void generate_blockboard(void){
+	struct Blockboard new_board;
+	new_board.N = N_arg;
+	new_board.i_max = N_arg*N_arg;
+	new_board.tiles = (struct Tuple**)malloc(sizeof(struct Tuple) * new_board.i_max);
 
 }
 
 
-void parse_arguments(int argc, char **argv){
-	printf("Loading arguments...\n");
-
-
+int coord_to_index(struct Tuple t, struct Blockboard b){
+	int index = ((t.y * b.N) + (t.x % b.N));
+	return index;
 }
