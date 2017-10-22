@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-
-
 typedef struct Tuple {
 	int x;
 	int y;
@@ -18,19 +16,24 @@ typedef struct Tuple {
 } Tuple;
 
 typedef struct Square {
-	int is_full;
-	struct Tuple contains_tile;
-} blank_Square;
+	int contains_tile;
+	struct Tuple coords;
+	int visited;
+} Square;
 
-typedef struct Blockboard{
+typedef struct Blockboard {
 	int N;
-	int i_max;
 	struct Tuple tiles[4096];
 	struct Tuple agent;
-} block_board;
+	struct Square squares[4096];
+} Blockboard;
+
+#include "Utils.h"
+#include "Stack.h"
 
 void generate_args(int argc, char** argv);
-struct Blockboard generate_blockboard(void);
-int coord_to_index(struct Tuple, struct Blockboard b);
+struct Blockboard* generate_blockboard(void);
 
 #endif
+
+

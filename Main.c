@@ -7,7 +7,7 @@ struct Tuple g_agent;
 
 int main (int argc, char **argv){
 	generate_args(argc, argv);
-	generate_blockboard();
+	struct Blockboard* new_board = generate_blockboard();
 }
 
 void generate_args(int argc, char** argv){
@@ -67,48 +67,58 @@ void generate_args(int argc, char** argv){
 }
 
 
-struct Blockboard generate_blockboard(void){
+struct Blockboard* generate_blockboard(void){
 	printf("Generating new block board.\n");
 
 	// Basic parameters. 
 	struct Blockboard new_board;
 	new_board.N = N_arg;
-	new_board.i_max = N_arg*N_arg;
+
+	// Add empty squares. 
+	int x = 0;
+	while(x < (new_board.N * new_board.N)){
+		struct Square new_square;
+		struct Tuple coords = index_to_coords(x, new_board);
+		new_square.coords = coords;
+		if(new_board.tiles[x].x == new_square.coords.x && new_board.tiles[x].x == new_square.coords.x){
+			new_square.contains_tile = 1;
+		} else {
+			new_square.contains_tile = 0;
+		}
+		new_square.visited = 0;
+		new_board.squares[x] = new_square;
+		x += 1;
+	}
 
 	// Add tiles. 
 	for(int i = 0; i < 4096; i++){
 		if(g_tile_arr[i].initialised == 1){
-
-			//  We copy data directly so we can reset the blockboard later. 
 			struct Tuple t;
-			t.initialised = 1;
 			t.x = g_tile_arr[i].x;
 			t.y = g_tile_arr[i].y;
-			new_board.tiles[i] = t;
-			coord_to_index(new_board.tiles[i], new_board);
+			new_board.squares[coord_to_index(t, new_board)].contains_tile = 1;
 		} else {
 			break;
 		}
 	}
 
-	printf("Added tiles to blockboard.\nGenerating agent tile.\n");
-	
-	int x = 0;
+		
+	x = 0;
 	while(new_board.tiles[x].initialised == 1){
 		if(new_board.tiles[x].x == g_agent.x && new_board.tiles[x].y == g_agent.y){
-			printf("New blockboard rejected. Tiles and agents colide!. [(%d,%d) && (%d,%d)]\nPress enter to exit.", g_agent.x, g_agent.y, new_board.tiles[x].x, new_board.tiles[x].y);
-			getchar();
+			printf("New blockboard rejected. Tiles and agents colide!. [(%d,%d) && (%d,%d)]\n", g_agent.x, g_agent.y, new_board.tiles[x].x, new_board.tiles[x].y);
 			exit(0);
 		}
 		x += 1;
+		
 	}
-	new_board.agent = g_agent;
 
-	return new_board;
+	struct Tuple agent;
+	agent = g_agent;
+	new_board.agent = agent;
+	printf("Setting agent at coords (%d,%d).\n", new_board.agent.x, new_board.agent.y);
+	return &new_board;
+
 }
 
 
-int coord_to_index(struct Tuple t, struct Blockboard b){
-	int index = (((t.y-1) * b.N) + (t.x % (b.N+1)));
-	return index;
-}
